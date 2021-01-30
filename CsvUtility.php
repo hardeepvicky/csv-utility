@@ -427,16 +427,16 @@ class CsvUtility
         return $records;
     }
     
-    public static function sortAndMapColumn($records, $order)
+    public static function sortColumn($records, $order)
     {
         foreach($records as $k => $record)
         {
             $row = [];
-            foreach($order as $col => $new_col)
+            foreach($order as $col)
             {
                 if ( isset($record[$col]) )
                 {
-                    $row[$new_col] = $record[$col];
+                    $row[$col] = $record[$col];
                 }
                 else
                 {
@@ -462,19 +462,23 @@ class CsvUtility
         }
         
         $header_row = [];
-        $i = 0;
+        $row_count = 0;
         foreach($records as $record)
         {
-            if ($i == 0 && $print_header)
+            $row_count++;
+            if ($row_count == 1)
             {
                 $header_row = array_keys($record);
-                fputcsv($handle, $header_row, $this->delimeter);
+                
+                if ($print_header)
+                {
+                    fputcsv($handle, $header_row, $this->delimeter);
+                }
             }
             
-            $data = $this->sortColumn([$record], $header_row);            
+            $data = self::sortColumn([$record], $header_row);            
             $record = $this->beforeInsert($data[0]);            
-            fputcsv($handle, $record, $this->delimeter);
-            $i++;
+            fputcsv($handle, $record, $this->delimeter);            
         }
         
         fclose($handle);
