@@ -78,7 +78,7 @@ class CsvUtility
     {
         if (!file_exists($this->file))
         {
-            throw new \Exception ("File not exist");
+            return [];
         }
         
         if (!is_readable($this->file))
@@ -112,7 +112,7 @@ class CsvUtility
                             {
                                 $records[] = $row;
 
-                                if ($limit && !$order_by)
+                                if ($limit && !$orders)
                                 {
                                     if ( $limit >= count($records) )
                                     {
@@ -125,7 +125,7 @@ class CsvUtility
                         {
                             $records[] = $row;
 
-                            if ($limit && !$order_by)
+                            if ($limit && !$orders)
                             {
                                 if ( $limit >= count($records) )
                                 {
@@ -146,9 +146,10 @@ class CsvUtility
             
             if ($limit)
             {
-                for ( $i = $limit; $i < count($records); $i++ )
+                $c = count($records);
+                for ( $i = $limit; $i < $c; $i++ )
                 {
-                    unset($records[$k]);
+                    unset($records[$i]);
                 }
             }
         }
@@ -453,6 +454,13 @@ class CsvUtility
     public function write($records, $mode = "w")
     {
         $print_header = ($mode == "w" || $mode == "w+");
+        
+        $first_row = $this->find([], [], [], 1);
+        
+        if ( empty($first_row) )
+        {
+            $print_header = true;
+        }
 
         $handle = fopen($this->file, $mode);
         
