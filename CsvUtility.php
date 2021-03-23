@@ -272,10 +272,10 @@ class CsvUtility
                             break;
 
                         case CsvDataType::TEXT:
-                            throw new Exception("Opreation $op not valid on Text");
+                            throw new \Exception("Opreation $op not valid on Text");
                             break;
                         case CsvDataType::BOOL:
-                            throw new Exception("Opreation $op not valid on Bool");
+                            throw new \Exception("Opreation $op not valid on Bool");
                             break;
                     }
                     
@@ -531,5 +531,49 @@ class CsvUtility
         }
         
         return $filter_row;
+    }
+    
+    public function update($save, $conditions)
+    {
+        $records = $this->find();
+        
+        $any_change = false;
+        foreach($records as $k => $record)
+        {
+            $result = $this->applyConditions($record, $conditions);
+            
+            if ($result)
+            {
+                $any_change = true;
+                $records[$k] = array_merge($record, $save);
+            }
+        }
+        
+        if ($any_change)
+        {
+            $this->write($records);
+        }
+    }
+    
+    public function delete($conditions)
+    {
+        $records = $this->find();
+        
+        $any_change = false;
+        foreach($records as $k => $record)
+        {
+            $result = $this->applyConditions($record, $conditions);
+            
+            if ($result)
+            {
+                $any_change = true;
+                unset($records[$k]);
+            }
+        }
+        
+        if ($any_change)
+        {
+            $this->write($records);
+        }
     }
 }
